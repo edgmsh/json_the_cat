@@ -1,20 +1,21 @@
 const needle = require("needle");
 
-let inArg = process.argv[2];
-if (inArg) {
-  const breeds = {
-    'Siberian': 'sib',
-    'Abyssinian': 'beng',
-  };
+const fetchBreedDescription = function(breedName, callback) {
 
-  needle.get("https://api.thecatapi.com/v1/breeds/search?q=" + breeds[inArg], {json: true}, (err, res) => {
+  needle.get("https://api.thecatapi.com/v1/breeds/search?q=" + breedName, {json: true}, (err, res) => {
     if (err) {
       return console.log(err);
     }
-    let todo = res.body;
-    console.log(todo);
+    if (!err && res.statusCode == 200) {
+      let respBody = res.body;
+      if (respBody.length > 0) {
+        callback(err,respBody[0]["description"]);
+      } else {
+        callback(err,null);
+      } 
+    } 
   }
   );
-} else {
-  console.log('No breed name provided');
-}
+};
+  
+module.exports = { fetchBreedDescription };
